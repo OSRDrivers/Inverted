@@ -1,0 +1,86 @@
+;
+; InvertedDriver.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=InvertedDriver.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 12
+InvertedDriver_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+InvertedDriver.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%InvertedDriver.DeviceDesc%=InvertedDriver_Device, Root\InvertedDriver ; TODO: edit hw-id
+
+[InvertedDriver_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+InvertedDriver.sys
+
+;-------------- Service installation
+[InvertedDriver_Device.NT.Services]
+AddService = InvertedDriver,%SPSVCINST_ASSOCSERVICE%, InvertedDriver_Service_Inst
+
+; -------------- InvertedDriver driver install sections
+[InvertedDriver_Service_Inst]
+DisplayName    = %InvertedDriver.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\InvertedDriver.sys
+
+;
+;--- InvertedDriver_Device Coinstaller installation ------
+;
+
+[InvertedDriver_Device.NT.CoInstallers]
+AddReg=InvertedDriver_Device_CoInstaller_AddReg
+CopyFiles=InvertedDriver_Device_CoInstaller_CopyFiles
+
+[InvertedDriver_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[InvertedDriver_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[InvertedDriver_Device.NT.Wdf]
+KmdfService =  InvertedDriver, InvertedDriver_wdfsect
+[InvertedDriver_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "InvertedDriver Installation Disk"
+InvertedDriver.DeviceDesc = "InvertedDriver Device"
+InvertedDriver.SVCDESC = "InvertedDriver Service"
