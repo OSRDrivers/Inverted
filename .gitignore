@@ -1,1 +1,17 @@
 ﻿.vs/Inverted/v16
+/InvertedDriver/x64/Debug
+/InvertedTest/x64/Debug/InvertedTest.tlog
+/InvertedTest/x64/Debug/vc142.pdb
+/InvertedTest/x64/Debug/vc142.idb
+/InvertedTest/x64/Debug/InvertedTest.obj
+/InvertedTest/x64/Debug/InvertedTest.log
+/InvertedTest/x64/Debug/InvertedTest.Build.CppClean.log
+/x64/Debug/InvertedDriver
+/x64/Debug/InvertedTest.pdb
+/x64/Debug/InvertedTest.ilk
+/x64/Debug/InvertedTest.exe
+/x64/Debug/InvertedDriver.sys
+/x64/Debug/InvertedDriver.pdb
+/x64/Debug/InvertedDriver.inf
+/x64/Debug/InvertedDriver.cer
+/InvertedTest/x64/Debug/InvertedTest.vcxproj.FileListAbsolute.txt

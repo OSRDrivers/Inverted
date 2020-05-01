@@ -8,7 +8,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <windows.h>
+#include <Windows.h>
 #include <inverted_ioctl.h>
 
 typedef struct _OVL_WRAPPER {
@@ -25,9 +25,10 @@ int main()
 {
     HANDLE  completionPortHandle;
     DWORD   code;
-    DWORD   Function;
+    DWORD   Function = 0;
     DWORD   dwThreadId = 0;
     HANDLE  hThread;
+    POVL_WRAPPER wrap;
 
     //
     // Open the Inverted device by name
@@ -102,23 +103,20 @@ int main()
 
             case 1:
             {
-                POVL_WRAPPER wrap;
-                DWORD code;
-
-                wrap = (POVL_WRAPPER)malloc(sizeof(OVL_WRAPPER));
+                wrap = static_cast<POVL_WRAPPER>(malloc(sizeof(OVL_WRAPPER)));
                 memset(wrap, 0, sizeof(OVL_WRAPPER));
 
                 //
                 // Test the IOCTL interface
                 //
                 DeviceIoControl(driverHandle,
-                                (DWORD)IOCTL_OSR_INVERT_NOTIFICATION,
-                                nullptr,                         // Ptr to InBuffer
+                                static_cast<DWORD>(IOCTL_OSR_INVERT_NOTIFICATION),
+                                nullptr,                      // Ptr to InBuffer
                                 0,                            // Length of InBuffer
-                                &Wrap->ReturnedSequence,      // Ptr to OutBuffer
+                                &wrap->ReturnedSequence,      // Ptr to OutBuffer
                                 sizeof(LONG),                 // Length of OutBuffer
-                                nullptr,                         // BytesReturned
-                                &Wrap->Overlapped);           // Ptr to Overlapped structure
+                                nullptr,                      // BytesReturned
+                                &wrap->Overlapped);           // Ptr to Overlapped structure
 
                 code = GetLastError();
 
@@ -135,13 +133,11 @@ int main()
 
             case 2:
             {
-                POVL_WRAPPER wrap;
-
-                wrap = (POVL_WRAPPER)malloc(sizeof(OVL_WRAPPER));
+                wrap = static_cast<POVL_WRAPPER>(malloc(sizeof(OVL_WRAPPER)));
                 memset(wrap, 0, sizeof(OVL_WRAPPER));
 
                 if (!DeviceIoControl(driverHandle,
-                                     (DWORD)IOCTL_OSR_INVERT_SIMULATE_EVENT_OCCURRED,
+                                     static_cast<DWORD>(IOCTL_OSR_INVERT_SIMULATE_EVENT_OCCURRED),
                                      nullptr,                         // Ptr to InBuffer
                                      0,                            // Length of InBuffer
                                      nullptr,                         // Ptr to OutBuffer
@@ -190,7 +186,7 @@ WINAPI CompletionPortThread(LPVOID PortHandle)
     DWORD byteCount = 0;
     ULONG_PTR compKey = 0;
     OVERLAPPED* overlapped = nullptr;
-    POVL_WRAPPER wrap = nullptr;
+    POVL_WRAPPER wrap;
     DWORD code;
 
     while (TRUE) {
@@ -224,13 +220,11 @@ WINAPI CompletionPortThread(LPVOID PortHandle)
         // the pointers are the same.  It would be nicer to use
         // CONTAINING_RECORD here... however you do that in user-mode.
         // 
-        wrap = (POVL_WRAPPER)overlapped;
+        wrap = reinterpret_cast<POVL_WRAPPER>(overlapped);
 
         code = GetLastError();
 
         printf(">>> Notification received.  Sequence = %ld\n",
                wrap->ReturnedSequence);
     }
-
-    return(0);
 }
